@@ -1,4 +1,5 @@
 import { createAgent, listModels, listVoices, updateAgent, deleteAgent, setBackend } from "../api/interface.js";
+import { Storage } from "./storage.js";
 import { readFile } from 'fs/promises';
 
 
@@ -26,6 +27,7 @@ export async function agent({ filename, numbers, model, server }) {
 export async function startAgent({ prompt, model='gpt-4o', language, voice, functions }) {
 
   let onClose, onError;
+  let agent;
   let terminate = new Promise((resolve, reject) => {
     onClose = resolve;
     onError = reject;
@@ -45,22 +47,18 @@ export async function startAgent({ prompt, model='gpt-4o', language, voice, func
 }
   let calls = {};
 
-  function onMessage(message) {
+  async function onMessage(message) {
     console.log('message', message);
-    message.call && (calls[message.call_id] = callHandler(message));
-    calls[message.call_id] && calls[message.call_id](message);
-    message.hangup && (message[message.call_id] = null);
-  }
-
-  function callHandler(message) {
-    console.log(`new call`, message);
-    let state = { ...message };
+    message.call && (calls[message.call_id] = Storage.getConversation({ id: message.call_id, startDate: new Date(), caller: message.call, callee: agent?.number })) 
+    calls[message.call_id] && calls[message.call_id].add(message);
+    message.hangup && await calls[message.call_id].release();
+    message[message.call_id] = null;
   }
 
   try {
 
 
-    let agent = await createAgent({
+    agent = await createAgent({
       modelName: model,
       prompt,
       options: getOptions(language, voice),
