@@ -9,7 +9,6 @@ setBackend(process.env.BACKEND_SERVER || 'http://localhost:4444/');
 
 export function setBackend(url) {
   backend = new URL(url);
-  console.log({ backend, origin: backend.origin }, 'backend');
   api = Axios.create({
     baseURL: `${backend.origin}/api`,
     method: "get"
@@ -45,6 +44,7 @@ async function functionHandler(message, functions, onMessage) {
                 method: f.method?.toUpperCase(),
                 body: f.method === 'post' ? fn.input : ''
               },
+              call_id: message.call_id
             });
             let response = await axios({
               url,
@@ -114,7 +114,6 @@ export async function createAgent({ modelName, prompt, options, functions, onClo
 
 export async function listModels() {
   let { data } = await api.get('/models');
-  console.log({ data }, 'models');
   return Object.entries(data);
 }
 

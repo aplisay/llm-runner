@@ -9,13 +9,13 @@ const conversations = new Map();
  * @class Storage
  */
 export class Storage {
-/**
- *
- *
- * @static
- * @type {Map<string, Storage>}
- * @memberof Storage
- */
+  /**
+   *
+   *
+   * @static
+   * @type {Map<string, Storage>}
+   * @memberof Storage
+   */
   static conversations = new Map();
 
   /**
@@ -45,23 +45,19 @@ export class Storage {
    * @memberof Storage
    */
   constructor({ id, startDate, caller, callee }) {
-    console.log({ arguments }, 'new storage object');
     Object.assign(this, { id, startDate: startDate || new Date(), caller, callee });
-    this._transcript = [{
-      starts: this.startDate,
-      caller: this.caller,
-      callee: this.callee
-    }];
+    this._transcript = [];
     conversations.set(id, this);
   }
-/**
- * Add an event to the storage object
- *
- * @memberof Storage
- */
+  /**
+   * Add an event to the storage object
+   *
+   * @memberof Storage
+   */
 
-  add(event) {
-    this._transcript.push(event);
+  add(event = {}) {
+    // Don't push empty events
+    Object.keys(event).length && this._transcript.push({ ...event, timeStamp: event.timeStamp || new Date() });
   }
 
   get transcript() {
@@ -74,15 +70,18 @@ export class Storage {
 
   async release({ endDate } = {}) {
     this.endDate = endDate || new Date();
-    let filename = `${this.id}-${this.caller}-${this.startDate.valueOf()}.json`;
     let struct = {
       ...this,
       _transcript: undefined,
       transcript: this._transcript
-    }
-    console.log({ struct }, 'saving');
-    await writeFile(filename, JSON.stringify(struct, null, 2));
+    };
+    await this.write(struct);
     conversations.delete(this.id);
-
   }
+
+  write(data) {
+    let filename = `${this.id}-${this.caller}-${this.startDate.valueOf()}.json`;
+    return writeFile(filename, JSON.stringify(data, null, 2));
+  }
+
 }
