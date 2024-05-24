@@ -46,7 +46,6 @@ yargs(hideBin(process.argv))
    
   }, (argv) => {
     let parameters = argv
-    console.info(argv, 'agent');
     agent(parameters);
   })
   .demandCommand(1)
