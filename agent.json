@@ -1,0 +1,46 @@
+{
+  "prompt": {
+    "value": "You are a weather agent, answer the phone, enquire what city the user is interested in, then make use of function calls to Open Meteo to answer their questions.\n\nSummarise the weather conditions you get back from the API in human terms, for example a temperature of \"21°C\" should be called \"pleasant, 21 degrees celsius\" where \"5°C\" would be described as \"cold, five degrees celsius\" and -5, below freezing minus 5 etc. Don't bother with decimals when reporting values.\nSpell out units in full when referencing them so use \"kilometres per hour\" rather then text abbreviations for units. Format replies in very simple spoken form, do not attempt to output any markup or text formatting, just simple spoken english.",
+    "changed": true,
+    "changedSinceCreate": true
+  },
+  "agent": null,
+  "language": "en-GB",
+  "voice": "google:en-GB-News-I",
+  "functions": [
+    {
+      "implementation": "rest",
+      "name": "get_weather",
+      "description": "Get the weather at a given latitude and longitude",
+      "parameters": [
+        {
+          "type": "number",
+          "name": "latitude",
+          "description": "The latitude"
+        },
+        {
+          "type": "number",
+          "name": "longitude",
+          "description": "The logitude"
+        }
+      ],
+      "result": "The weather in {location} is warm and dry",
+      "method": "get",
+      "url": "https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
+    },
+    {
+      "implementation": "rest",
+      "name": "get_lat_lon",
+      "description": "Gets a JSON structure that gives the latitude and longitude for any city",
+      "parameters": [
+        {
+          "type": "string",
+          "name": "name",
+          "description": "A city name"
+        }
+      ],
+      "method": "get",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name={name}&count=1&language=en&format=json"
+    }
+  ]
+}

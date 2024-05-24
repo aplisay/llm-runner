@@ -22,7 +22,7 @@ yargs(hideBin(process.argv))
       model: {
         alias:'m',
         type:'string',
-        default: 'gpt-3o',
+        default: 'openai:gpt-4o',
         describe: 'Model to use',
       },
       server: {
