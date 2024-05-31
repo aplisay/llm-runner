@@ -83,7 +83,7 @@ export async function agent({ filename, numbers, model, server }) {
           logger.info({ agent }, `Agent closed with reason: ${reason}`);
           onClose && onClose(reason);
         },
-        onMessage
+        onMessage, logger
       });
       let { number, id, socket } = agent || {};
       if (!agent) {

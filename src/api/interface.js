@@ -82,7 +82,7 @@ const transformFunctions = (functions) => functions?.map?.(({ name, description,
 }));
 
 
-export async function createAgent({ modelName, prompt, options, functions, onClose, onMessage }) {
+export async function createAgent({ modelName, prompt, options, functions, onClose, onMessage, logger }) {
   let { data } = await api.post('/agents', { modelName, prompt, options, functions: transformFunctions(functions) });
   if (data?.socket) {
     let wsPath = `${backend.protocol === 'https:' ? 'wss:' : 'ws:'}//${backend.host}${data?.socket}`;
@@ -92,7 +92,9 @@ export async function createAgent({ modelName, prompt, options, functions, onClo
         data = JSON.parse(message.data);
         onMessage && onMessage(data);
         if (data.function_calls) {
+          logger.info({ function_calls: data.function_calls }, 'calls');
           let response = await functionHandler(data, functions, onMessage);
+          logger.info({ function_calls: data.function_calls }, 'calls response');
           response?.call_id && ws.send(JSON.stringify(response));
           onMessage && onMessage(response);
         }
