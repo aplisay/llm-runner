@@ -33,7 +33,7 @@ export async function agent({ filename, numbers, model, server }) {
     }
   }
 
-  export async function startAgent({ prompt, model = 'gpt-4o', language, voice, functions }) {
+  export async function startAgent({ prompt, model = 'openai:gpt-4o', language, voice, functions }) {
 
     let onClose, onError;
     let agent;

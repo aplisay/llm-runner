@@ -54,7 +54,7 @@ async function functionHandler(message, functions, onMessage) {
             result = response.data;
           } catch (e) {
             result = e.message;
-            console.error(e, 'thing');
+            console.error(e, 'API Error');
             error = JSON.stringify(e);
           }
           return { ...fn, result: JSON.stringify(result, null, 2), error };
